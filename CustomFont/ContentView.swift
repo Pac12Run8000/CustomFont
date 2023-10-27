@@ -7,24 +7,39 @@
 
 import SwiftUI
 
+class BoldTextViewModel: ObservableObject {
+    @Published var isBoldTextEnabled: Bool = UIAccessibility.isBoldTextEnabled
+}
+
 struct ContentView: View {
+    @StateObject var viewModel = BoldTextViewModel()
+
     var body: some View {
-        VStack {
-            Image(systemName: "globe")
-                .imageScale(.large)
-                .foregroundColor(.accentColor)
-            Text("Hello, world!")
+        VStack(spacing: 20) {
+            // Adapt font based on Bold Text setting
+            Text("This text adapts to Bold Text setting")
+                .font(Font.custom(viewModel.isBoldTextEnabled ? "Helvetica-Bold" : "Helvetica", size: 20))
+                .adaptiveFont()
         }
         .padding()
-        VStack(spacing: 20) {
-                    // Hardcoded font style that won't respond to Bold Text setting
-                    Text("This is hardcoded regular text")
-                        .font(.custom("Helvetica", size: 20))
-                    
-                    Text("This is hardcoded bold text")
-                        .font(.custom("Helvetica-Bold", size: 20))
-                }
-                .padding()
+        .onReceive(NotificationCenter.default.publisher(for: UIAccessibility.boldTextStatusDidChangeNotification)) { _ in
+            viewModel.isBoldTextEnabled = UIAccessibility.isBoldTextEnabled
+        }
+    }
+}
+
+extension View {
+    func adaptiveFont() -> some View {
+        self.modifier(AdaptiveFont())
+    }
+}
+
+struct AdaptiveFont: ViewModifier {
+    @Environment(\.sizeCategory) var sizeCategory
+
+    func body(content: Content) -> some View {
+        content
+            .font(.system(size: UIFontMetrics.default.scaledValue(for: 20))) // 20 is the base size
     }
 }
 
