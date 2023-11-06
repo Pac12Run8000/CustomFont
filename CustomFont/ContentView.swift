@@ -20,6 +20,7 @@ struct ContentView: View {
             Text("This text adapts to Bold Text setting")
                 .font(Font.custom(viewModel.isBoldTextEnabled ? "Helvetica-Bold" : "Helvetica", size: 20))
                 .adaptiveFont()
+            Text(viewModel.isBoldTextEnabled ? "Bold is enabled" : "Bold is Not enabled")
         }
         .padding()
         .onReceive(NotificationCenter.default.publisher(for: UIAccessibility.boldTextStatusDidChangeNotification)) { _ in
